@@ -38,7 +38,7 @@ export class SkLearnContainerStack extends cdk.Stack {
               'docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION'
             ]
           },
-          'post-build': {
+          'post_build': {
             'commands': [
               'docker push $REPOSITORY_URI:latest',
               'docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION',
