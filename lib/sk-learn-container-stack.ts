@@ -28,10 +28,15 @@ export class SkLearnContainerStack extends cdk.Stack {
               'python': '3.10'
             }
           },
+          'pre_build': {
+            'commands': [
+              'echo Logging in to Amazon ECR...',
+              'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS ' +
+              '--password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com'
+            ]
+          },
           'build': {
             'commands': [
-              '$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)',
-              'cd sk-learn',
               'pip install -r requirements.txt',
               'python setup.py bdist_wheel',
               'docker build -t $REPOSITORY_URI:latest .',
