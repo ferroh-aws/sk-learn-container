@@ -10,7 +10,9 @@ export class SkLearnPipelineStack extends cdk.Stack {
     const pipeline = new CodePipeline(this, 'Pipeline', {
       pipelineName: 'sklearn-container-pipeline',
       synth: new ShellStep('Synth', {
-        input: CodePipelineSource.gitHub('ferroh-aws/sk-learn-container', 'main'),
+        input: CodePipelineSource.connection('sk-learn-container', 'main', {
+          connectionArn: 'arn:aws:codestar-connections:us-east-1:253323635394:connection/9e4f343a-756a-46f0-8045-feabd549e174'
+        }),
         commands: [
           'npm ci',
           'npm run build',
