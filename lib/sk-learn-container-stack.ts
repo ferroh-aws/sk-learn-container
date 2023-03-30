@@ -2,6 +2,8 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Repository, TagMutability } from 'aws-cdk-lib/aws-ecr';
 import { BuildSpec, LinuxBuildImage, PipelineProject } from 'aws-cdk-lib/aws-codebuild';
+import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline';
+import { CodeBuildAction, CodeStarConnectionsSourceAction } from 'aws-cdk-lib/aws-codepipeline-actions';
 
 export class SkLearnContainerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -60,5 +62,34 @@ export class SkLearnContainerStack extends cdk.Stack {
       }
     });
     repository.grantPullPush(imageBuild);
+
+    const sourceArtifact = new Artifact();
+
+    const sourceAction = new CodeStarConnectionsSourceAction({
+      actionName: 'DockerSources',
+      branch: 'main',
+      connectionArn: 'arn:aws:codestar-connections:us-east-1:253323635394:connection/9e4f343a-756a-46f0-8045-feabd549e174',
+      output: sourceArtifact,
+      owner: 'ferroh-aws',
+      repo: 'sklearn-sagemaker'
+    });
+    const buildAction = new CodeBuildAction({
+      actionName: 'buildContainer',
+      executeBatchBuild: false,
+      input: sourceArtifact,
+      project: imageBuild
+    });
+    const dockerPipeline = new Pipeline(this, 'DockerImagePipeline', {
+      stages: [
+        {
+          stageName: 'GetSource',
+          actions: [sourceAction]
+        },
+        {
+          stageName: 'BuildDockerImage',
+          actions: [buildAction]
+        }
+      ]
+    });
   }
 }
