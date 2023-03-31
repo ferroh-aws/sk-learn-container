@@ -63,6 +63,9 @@ export class SkLearnContainerStack extends cdk.Stack {
       environmentVariables: {
         'REPOSITORY_URI': {
           value: repository.repositoryUri
+        },
+        'AWS_ACCOUNT_ID': {
+          value: cdk.Aws.ACCOUNT_ID
         }
       }
     });
